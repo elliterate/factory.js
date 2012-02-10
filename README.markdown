@@ -43,13 +43,15 @@ You can pass an optional set of properties which will override the factory defau
     bob.name; //=> "Bob"
     bob.age;  //=> 21
 
-### Factory.sequence(name, callback)
+### Factory.sequence(name, [callback])
 
 Define a sequence that may be iterated upon.
 
     Factory.sequence("email", function(n) {
       return "test+" + n + "@example.com";
     });
+
+Sequences without a callback function will simply return the next integer in the sequence.
 
 Sequences may also be scoped to a factory definition. These sequences will only be available within that factory. Every
 object created by the factory will automatically include the next iteration in the sequence.

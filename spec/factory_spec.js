@@ -64,6 +64,22 @@ describe("Factory", function() {
         expect(Factory.create("admin").email).toEqual("admin+3@example.com");
       });
     });
+
+    describe("when no callback is given", function() {
+      beforeEach(function() {
+        Factory.define("record", function() {
+          return {
+            id: this.sequence()
+          };
+        });
+      });
+
+      it("should return the next integer in the sequence", function() {
+        expect(Factory.create("record").id).toEqual(1);
+        expect(Factory.create("record").id).toEqual(2);
+        expect(Factory.create("record").id).toEqual(3);
+      });
+    });
   });
 
   describe(".create", function() {
@@ -119,6 +135,18 @@ describe("Factory", function() {
       expect(Factory.next("foo")).toEqual(5);
 
       expect(Factory.next("bar")).toEqual(3);
+    });
+
+    describe("when the sequence was defined without a callback", function() {
+      beforeEach(function() {
+        Factory.sequence("id");
+      });
+
+      it("should return the next integer in the sequence", function() {
+        expect(Factory.next("id")).toEqual(1);
+        expect(Factory.next("id")).toEqual(2);
+        expect(Factory.next("id")).toEqual(3);
+      });
     });
   });
 });

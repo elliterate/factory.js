@@ -23,7 +23,7 @@ Factory = (function() {
     }
 
     factory.builder.sequence = function(callback) {
-      return callback(factory.count);
+      return callback ? callback(factory.count) : factory.count;
     };
 
     factories[name] = factory;
@@ -56,7 +56,7 @@ Factory = (function() {
 
     sequence.count += 1;
 
-    return sequence.callback(sequence.count);
+    return sequence.callback ? sequence.callback(sequence.count) : sequence.count;
   };
 
   module.reset = function() {
