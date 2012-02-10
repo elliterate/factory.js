@@ -32,6 +32,38 @@ describe("Factory", function() {
       expect(triangle.sides).toEqual(3);
       expect(triangle.color).toEqual("green");
     });
+
+    describe("this.sequence", function() {
+      it("should define a local sequence that will iterate with each .create", function() {
+        Factory.define("user", function() {
+          return {
+            email: this.sequence(function(n) {
+              return "user+" + n + "@example.com";
+            })
+          };
+        });
+
+        Factory.define("admin", function() {
+          return {
+            email: this.sequence(function(n) {
+              return "admin+" + n + "@example.com";
+            })
+          };
+        });
+
+        expect(Factory.create("user").email).toEqual("user+1@example.com");
+        expect(Factory.create("user").email).toEqual("user+2@example.com");
+        expect(Factory.create("user").email).toEqual("user+3@example.com");
+
+        expect(Factory.create("admin").email).toEqual("admin+1@example.com");
+        expect(Factory.create("admin").email).toEqual("admin+2@example.com");
+
+        expect(Factory.create("user").email).toEqual("user+4@example.com");
+        expect(Factory.create("user").email).toEqual("user+5@example.com");
+
+        expect(Factory.create("admin").email).toEqual("admin+3@example.com");
+      });
+    });
   });
 
   describe(".create", function() {

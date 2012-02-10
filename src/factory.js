@@ -9,27 +9,33 @@ Factory = (function() {
   };
 
   module.define = function(name) {
-    var callback,
-      options = {};
+    var factory = {
+      options: {},
+      builder: {},
+      count: 0
+    };
 
     if (arguments.length == 2) {
-      callback = arguments[1];
+      factory.callback = arguments[1];
     } else {
-      options = arguments[1];
-      callback = arguments[2];
+      factory.options = arguments[1];
+      factory.callback = arguments[2];
     }
 
-    factories[name] = {
-      options: options,
-      callback: callback
+    factory.builder.sequence = function(callback) {
+      return callback(factory.count);
     };
+
+    factories[name] = factory;
   };
 
   module.create = function(name, options) {
     var instance,
       factory = factories[name];
 
-    instance = factory.callback();
+    factory.count += 1;
+
+    instance = factory.callback.call(factory.builder);
 
     if (factory.options.parent) {
       instance = module.create(factory.options.parent, instance);

@@ -51,6 +51,21 @@ Define a sequence that may be iterated upon.
       return "test+" + n + "@example.com";
     });
 
+Sequences may also be scoped to a factory definition. These sequences will only be available within that factory. Every
+object created by the factory will automatically include the next iteration in the sequence.
+
+    Factory.define("user", function() {
+      return {
+        email: this.sequence(function(n) {
+          return "test+" + n + "@example.com";
+        }
+      };
+    });
+
+    Factory.create("user").email; //=> "test+1@example.com"
+    Factory.create("user").email; //=> "test+2@example.com"
+    Factory.create("user").email; //=> "test+3@example.com"
+
 ### Factory.next(name)
 
 Return the next iteration in the sequence.
