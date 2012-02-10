@@ -1,5 +1,5 @@
 Factory = (function() {
-  var module = {};
+  var self = {};
 
   var factories, sequences;
 
@@ -8,7 +8,7 @@ Factory = (function() {
     sequences = {};
   };
 
-  module.define = function(name) {
+  self.define = function(name) {
     var factory = {
       options: {},
       builder: {},
@@ -29,7 +29,7 @@ Factory = (function() {
     factories[name] = factory;
   };
 
-  module.create = function(name, options) {
+  self.create = function(name, options) {
     var instance,
       factory = factories[name];
 
@@ -38,20 +38,20 @@ Factory = (function() {
     instance = factory.callback.call(factory.builder);
 
     if (factory.options.parent) {
-      instance = module.create(factory.options.parent, instance);
+      instance = self.create(factory.options.parent, instance);
     }
 
     return _(instance).extend(options);
   };
 
-  module.sequence = function(name, sequence) {
+  self.sequence = function(name, sequence) {
     sequences[name] = {
       count: 0,
       callback: sequence
     };
   };
 
-  module.next = function(name) {
+  self.next = function(name) {
     var sequence = sequences[name];
 
     sequence.count += 1;
@@ -59,11 +59,11 @@ Factory = (function() {
     return sequence.callback ? sequence.callback(sequence.count) : sequence.count;
   };
 
-  module.reset = function() {
+  self.reset = function() {
     initialize();
   };
 
   initialize();
 
-  return module;
+  return self;
 }());
