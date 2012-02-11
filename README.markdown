@@ -60,7 +60,7 @@ object created by the factory will automatically include the next iteration in t
       return {
         email: this.sequence(function(n) {
           return "test+" + n + "@example.com";
-        }
+        })
       };
     });
 
