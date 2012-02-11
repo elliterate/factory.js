@@ -11,7 +11,6 @@ Factory = (function() {
   self.define = function(name) {
     var factory = {
       options: {},
-      builder: {},
       count: 0
     };
 
@@ -22,20 +21,23 @@ Factory = (function() {
       factory.callback = arguments[2];
     }
 
-    factory.builder.sequence = function(callback) {
-      return callback ? callback(factory.count) : factory.count;
-    };
-
     factories[name] = factory;
   };
 
   self.create = function(name, options) {
-    var instance,
+    var builder,
+      instance,
       factory = factories[name];
 
     factory.count += 1;
 
-    instance = factory.callback.call(factory.builder);
+    builder = {
+      sequence: function(callback) {
+        return callback ? callback(factory.count) : factory.count;
+      }
+    };
+
+    instance = factory.callback.call(builder);
 
     if (factory.options.parent) {
       instance = self.create(factory.options.parent, instance);
