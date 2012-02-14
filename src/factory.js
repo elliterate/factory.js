@@ -1,59 +1,75 @@
 Factory = (function() {
-  var self = {};
+  var Factory, factories, sequences;
 
-  var factories, sequences;
-
-  var initialize = function() {
+  function initialize() {
     factories = {};
     sequences = {};
+  }
+
+  Factory = function(options, callback) {
+    var self = {},
+      builder = {},
+      count = 0;
+
+    options = options || {};
+
+    builder.sequence = function(callback) {
+      return callback ? callback(count) : count;
+    };
+
+    function hasParent() {
+      return !!options.parent;
+    }
+
+    function getParent() {
+      return factories[options.parent];
+    }
+
+    self.create = function(overrides) {
+      var instance;
+
+      count += 1;
+
+      instance = callback.call(builder);
+
+      if (hasParent()) {
+        instance = getParent().create(instance);
+      }
+
+      return _(instance).extend(overrides);
+    };
+
+    return self;
   };
 
-  self.define = function(name) {
-    var factory = {
-      options: {},
-      count: 0
-    };
+  Factory.define = function(name) {
+    var callback,
+      options = {};
 
     if (arguments.length == 2) {
-      factory.callback = arguments[1];
+      callback = arguments[1];
     } else {
-      factory.options = arguments[1];
-      factory.callback = arguments[2];
+      options = arguments[1];
+      callback = arguments[2];
     }
 
-    factories[name] = factory;
+    factories[name] = new Factory(options, callback);
   };
 
-  self.create = function(name, options) {
-    var builder,
-      instance,
-      factory = factories[name];
+  Factory.create = function(name, overrides) {
+    var factory = factories[name];
 
-    factory.count += 1;
-
-    builder = {
-      sequence: function(callback) {
-        return callback ? callback(factory.count) : factory.count;
-      }
-    };
-
-    instance = factory.callback.call(builder);
-
-    if (factory.options.parent) {
-      instance = self.create(factory.options.parent, instance);
-    }
-
-    return _(instance).extend(options);
+    return factory.create(overrides);
   };
 
-  self.sequence = function(name, sequence) {
+  Factory.sequence = function(name, sequence) {
     sequences[name] = {
       count: 0,
       callback: sequence
     };
   };
 
-  self.next = function(name) {
+  Factory.next = function(name) {
     var sequence = sequences[name];
 
     sequence.count += 1;
@@ -61,11 +77,11 @@ Factory = (function() {
     return sequence.callback ? sequence.callback(sequence.count) : sequence.count;
   };
 
-  self.reset = function() {
+  Factory.reset = function() {
     initialize();
   };
 
   initialize();
 
-  return self;
+  return Factory;
 }());
